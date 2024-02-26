@@ -35,7 +35,7 @@ public:
 template<class TKey, class TValue>
 class ITable {
 public:
-	virtual TValue* search(const TKey& val) const = 0;
+	virtual TValue* found(const TKey& val) const = 0;
 	virtual void insert(const TKey& key, const TValue& val) = 0;
 	virtual void delet(const TKey& key) = 0;
 	virtual void replase(const TKey& key, const TValue& val) = 0;
@@ -47,7 +47,7 @@ class UnorderedTable: public ITable<TKey, TValue>{
 public:
 	UnorderedTable() = default;
 	
-	TValue* search(const TKey& key) const override {
+	TValue* found(const TKey& key) const override {
 		for (auto v : data) {
 			if (v == key) {
 				return &v.val();
@@ -124,17 +124,17 @@ class UnorderedTableOnList : public ITable<TKey, TValue> {
 public:
 	UnorderedTableOnList() = default;
 
-	TValue* search(const TKey& key) const override {
-		for (auto const& v : data) {
+	TValue* found(const TKey& key) const override {
+		for (auto& v : data) {
 			if (v == key) {
-				return &(v.val());
+				return &v.val();
 			}
 		}
 		return nullptr;
 	}
 
 	void insert(const TKey& key, const TValue& val) override {
-		for (auto const& v : data) {
+		for (const auto& v : data) {
 			if (v == key) {
 				return;
 			}
@@ -143,10 +143,20 @@ public:
 	}
 
 	void delet(const TKey& key) override {
-		
+		for (auto v = data.begin(); v != data.end(); ++v) {
+			if ((*v) == key) {
+				data.erase(v);
+				return;
+			}
+		}
 	}
 
 	void replase(const TKey& key, const TValue& val) override {
-		
+		for (auto& v : data) {
+			if (v == key) {
+				v.val() = val;
+				return;
+			}
+		}
 	}
 };
