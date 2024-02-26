@@ -1,0 +1,16 @@
+debug/
+*/debug/
+**/debug/
+release/
+*/release/
+**/release/
+x64/
+*x64/
+**/x64/
+x86/
+*/x86/
+**/x86/
+.vs/
+*/.vs/
+**/.vs/
+Matrix/Tests/x64/Debug/Tests.ilk
