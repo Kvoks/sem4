@@ -1,4 +1,8 @@
+#ifndef BINARY_H
+#define BINARY_H
+
 #include<iostream>
+#include<queue>
 
 template <typename T>
 class Node {
@@ -22,9 +26,9 @@ public:
 //Node* create(int value, Node* l = nullptr, Node* r = nullptr){};
 template <typename T>
 class BinaryTree {
-	Node<T> *root;	// корень
+protected:
+	Node<T>* root;	// корень
 public:
-
 	BinaryTree(Node<T>* root = nullptr) {
 		this->root = root;
 	}
@@ -45,14 +49,35 @@ public:
 		}
 	}
 
+	void BFS(void(*operation)(Node<T>*)) {
+		std::queue<Node<T>*> q;
+		q.push(root);
+		Node<T>* node, * position = nullptr;
+		while (!q.empty()) {
+			node = q.front();
+			q.pop();
+			operation(node);
+			if (node->left != nullptr)
+				q.push(node->left);
+			if (node->right != nullptr)
+				q.push(node->right);
+		}
+	}
+
 	void insert(T value) {
 		if (root == nullptr) {
 			root = new Node<T>(value);
 		}
-		insert_dfs(value, root);
+		else {
+			insert_dfs(value, root);
+		}
 	}
 
 	void insert_dfs(T value,Node<T>* cur){
+		if (cur == nullptr) {
+			cur = new Node<T>(value);
+			return;
+		}
 		if (cur->left == nullptr) {
 			Node<T>* newNode = new Node<T>(value);
 			cur->left = newNode;
@@ -83,12 +108,17 @@ public:
 		return cur;
 	}
 	void del(Node<T>* node){
+		if (node == nullptr) {
+			return;
+		}
 		if (node->left != nullptr) {
 			del(node->left);
 		}
 		if (node->right != nullptr) {
 			del(node->right);
 		}
+		node->left = nullptr;
+		node->right = nullptr;
 		delete node;
 	}
 	
@@ -96,3 +126,4 @@ public:
 		//каким образом он должен заменить, в плане что и на что
 	}
 };
+#endif // !BINARY_H
