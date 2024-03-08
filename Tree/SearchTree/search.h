@@ -59,5 +59,49 @@ public:
 		return cur;
 	}
 
+	void remove(Node<T>* replaceable, T value) {
+		if (replaceable == nullptr || this->root == nullptr) {
+			insert(value);
+			return;
+		}
+		if (replaceable == this->root) {
+			if (replaceable->left->data <= value && replaceable->right->data > value) {
+				replaceable->data = value;
+				return;
+			}
+			std::cout << "replacement is not possible" << std::endl;
+			return;
+		}
+		remove_dfs(replaceable, value, this->root);
+	}
+
+	void remove_dfs(Node<T>* replaceable, T value, Node<T>* cur) {
+		if (cur == nullptr) {
+			std::cout << "replacement is not possible" << std::endl;
+			return;
+		}
+	
+		if (cur->left == replaceable) {
+			if (cur->data <= value && replaceable->left->data <= value && replaceable->right->data > value) {
+				replaceable->data = value;
+			}
+			return;
+		}
+
+		if (cur->right == replaceable) {
+			if (cur->data > value && replaceable->left->data <= value && replaceable->right->data > value) {
+				replaceable->data = value;
+			}
+			return;
+		}
+
+		if (value <= cur->data) {
+			remove_dfs(replaceable, value, cur->left);
+		}
+		else {
+			remove_dfs(replaceable, value, cur->right);
+			return;
+		}
+	}
 };
 #endif // !SEARCH_H
