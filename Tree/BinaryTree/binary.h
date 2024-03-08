@@ -21,6 +21,10 @@ public:
 		right = r.right;
 	}
 	~Node(){}
+
+	bool operator==(const Node<T>* r) {
+		return !((this->left == r->left) || (this->right == r->right) || (this->data == r->data));
+	}
 };
 
 //Node* create(int value, Node* l = nullptr, Node* r = nullptr){};
@@ -122,8 +126,33 @@ public:
 		delete node;
 	}
 	
-	void remove(Node<T>* node) {
-		//каким образом он должен заменить, в плане что и на что
+	void remove(Node<T>* replaceable, T value) {
+		if (root == nullptr) {
+			root = new Node<T>(value);
+		}
+		else {
+			remove_dfs(replaceable, value, root);
+		}
 	}
+
+	void remove_dfs(Node<T>* replaceable, T value, Node<T>* cur) {
+		if (cur == nullptr || cur == replaceable) {
+			cur = new Node<T>(value);
+			return;
+		}
+		if (cur->left == replaceable) {
+			Node<T>* newNode = new Node<T>(value);
+			cur->left = newNode;
+			return;
+		}
+		if (cur->right == replaceable) {
+			Node<T>* newNode = new Node<T>(value);
+			cur->right = newNode;
+			return;
+		}
+		remove_dfs(replaceable, value, cur->left);
+		remove_dfs(replaceable, value, cur->right);
+	}
+
 };
 #endif // !BINARY_H
