@@ -127,27 +127,27 @@ public:
 	}
 	
 	void remove(Node<T>* replaceable, T value) {
-		if (root == nullptr) {
-			root = new Node<T>(value);
+		if (root == nullptr || replaceable == nullptr) {
+			insert(value);
+			return;
 		}
-		else {
-			remove_dfs(replaceable, value, root);
+		if (root == replaceable) {
+			root->data = value;
 		}
+		remove_dfs(replaceable, value, root);
 	}
 
 	void remove_dfs(Node<T>* replaceable, T value, Node<T>* cur) {
-		if (cur == nullptr || cur == replaceable) {
-			cur = new Node<T>(value);
+		if (cur == nullptr) {
+			std::cout << "replacement is not possible" << std::endl;
 			return;
 		}
 		if (cur->left == replaceable) {
-			Node<T>* newNode = new Node<T>(value);
-			cur->left = newNode;
+			cur->left->data = value;
 			return;
 		}
 		if (cur->right == replaceable) {
-			Node<T>* newNode = new Node<T>(value);
-			cur->right = newNode;
+			cur->right->data = value;
 			return;
 		}
 		remove_dfs(replaceable, value, cur->left);
