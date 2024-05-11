@@ -56,12 +56,16 @@ public:
 		if (cur->right != nullptr && value > cur->data) {
 			find_dfs(value, cur->right);
 		}
-		return cur;
+		if (cur->right == nullptr && cur->left == nullptr) {
+			std::cout << "element does not exist" << std::endl;
+			return nullptr;
+		}
 	}
 
-	void remove(Node<T>* replaceable, T value) {
+	void replace(Node<T>* replaceable, T value) {
 		if (replaceable == nullptr || this->root == nullptr) {
-			insert(value);
+			//insert(value);
+			std::cout << "the element to be replaced does not exist" << std::endl;
 			return;
 		}
 		if (replaceable == this->root) {
@@ -72,10 +76,10 @@ public:
 			std::cout << "replacement is not possible" << std::endl;
 			return;
 		}
-		remove_dfs(replaceable, value, this->root);
+		replace_dfs(replaceable, value, this->root);
 	}
 
-	void remove_dfs(Node<T>* replaceable, T value, Node<T>* cur) {
+	void replace_dfs(Node<T>* replaceable, T value, Node<T>* cur) {
 		if (cur == nullptr) {
 			std::cout << "replacement is not possible" << std::endl;
 			return;
@@ -96,12 +100,85 @@ public:
 		}
 
 		if (value <= cur->data) {
-			remove_dfs(replaceable, value, cur->left);
+			replace_dfs(replaceable, value, cur->left);
 		}
 		else {
-			remove_dfs(replaceable, value, cur->right);
+			replace_dfs(replaceable, value, cur->right);
 			return;
 		}
 	}
+
+	void remove(T value) {
+		Node<T>* del = find(value);
+		if (del == nullptr) {
+			std::cout << "element does not exist" << std::endl;
+			return;
+		}
+		
+		Node<T>* cur = this->root;
+
+		while (cur->left!= del || cur->right!= del) {//цилк для сохранения предка
+			if (cur->data < del->data) {
+				cur = cur->right;
+			}
+			else {
+				cur = cur->left;
+			}
+		}
+
+		if (del->left == nullptr && del->right == nullptr) {
+			if (cur->left == del) {
+				cur->left = nullptr;
+			}
+			else {
+				cur->right == nullptr;
+			}
+			delete del;
+			return;
+		}
+
+		if (del->left == nullptr && del->right != nullptr) {
+			if (cur->left == del) {
+				cur->left = del->right;
+			}
+			else {
+				cur->right == del->right;
+			}
+			del->right = nullptr;
+			delete del;
+			return;
+		}
+
+		if (del->left != nullptr && del->right == nullptr) {
+			if (cur->left == del) {
+				cur->left = del->left;
+			}
+			else {
+				cur->right == del->left;
+			}
+			del->left = nullptr;
+			delete del;
+			return;
+		}
+
+		cur = del->right;
+
+		while (cur->left->left != nullptr) {
+			cur = cur->left;
+		}
+
+		T v = cur->left->data;
+
+		if (cur->left->right != nullptr) {
+			cur->left = cur->left->right;
+		}
+		else {
+			cur->left = nullptr;
+		}
+
+		del->data = v;
+		return;
+	}
+	
 };
 #endif // !SEARCH_H
