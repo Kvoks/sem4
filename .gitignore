@@ -14,3 +14,7 @@ x86/
 */.vs/
 **/.vs/
 Matrix/Tests/x64/Debug/Tests.ilk
+*.vcxproj
+*.filters
+*.user
+*.sln
