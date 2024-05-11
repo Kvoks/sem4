@@ -32,6 +32,7 @@ template <typename T>
 class BinaryTree {
 protected:
 	Node<T>* root;	// корень
+	int flag = 0;
 public:
 	BinaryTree(Node<T>* root = nullptr) {
 		this->root = root;
@@ -69,6 +70,7 @@ public:
 	}
 
 	void insert(T value) {
+		this->flag = 0;
 		if (root == nullptr) {
 			root = new Node<T>(value);
 		}
@@ -78,24 +80,33 @@ public:
 	}
 
 	void insert_dfs(T value,Node<T>* cur){
-		if (cur == nullptr) {
-			cur = new Node<T>(value);
-			return;
+		if (this->flag == 1) { 
+			return; 
 		}
-		if (cur->left == nullptr) {
-			Node<T>* newNode = new Node<T>(value);
-			cur->left = newNode;
-			return;
+		else{
+			if (cur->left == nullptr && this->flag == 0) {
+				Node<T>* newNode = new Node<T>(value);
+				cur->left = newNode;
+				this->flag = 1;
+				return;
+			}
+			else {
+				if (cur->right == nullptr && this->flag == 0) {
+					Node<T>* newNode = new Node<T>(value);
+					cur->right = newNode;
+					this->flag = 1;
+					return;
+				}
+				else{
+					insert_dfs(value, cur->left);
+					insert_dfs(value, cur->right);
+				}
+			}
 		}
-		if (cur->right == nullptr) {
-			Node<T>* newNode = new Node<T>(value);
-			cur->right = newNode;
-			return;
-		}
-		insert_dfs(value, cur->left);
-		insert_dfs(value, cur->right);
+
 	}
 	Node<T>* find(T value){
+
 		return find_dfs(value, root);
 	}
 
@@ -126,7 +137,7 @@ public:
 		delete node;
 	}
 	
-	void remove(Node<T>* replaceable, T value) {
+	void replace(Node<T>* replaceable, T value) {
 		if (root == nullptr || replaceable == nullptr) {
 			insert(value);
 			return;
@@ -134,10 +145,10 @@ public:
 		if (root == replaceable) {
 			root->data = value;
 		}
-		remove_dfs(replaceable, value, root);
+		replace_dfs(replaceable, value, root);
 	}
 
-	void remove_dfs(Node<T>* replaceable, T value, Node<T>* cur) {
+	void replace_dfs(Node<T>* replaceable, T value, Node<T>* cur) {
 		if (cur == nullptr) {
 			std::cout << "replacement is not possible" << std::endl;
 			return;
@@ -150,8 +161,8 @@ public:
 			cur->right->data = value;
 			return;
 		}
-		remove_dfs(replaceable, value, cur->left);
-		remove_dfs(replaceable, value, cur->right);
+		replace_dfs(replaceable, value, cur->left);
+		replace_dfs(replaceable, value, cur->right);
 	}
 
 };

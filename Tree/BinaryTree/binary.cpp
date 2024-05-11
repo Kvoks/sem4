@@ -8,6 +8,6 @@ int main() {
 	b.insert(10);
 	b.insert(7);
 	b.find(10);
-	b.remove(nullptr,8);
+	b.replace(nullptr,8);
 	return 0;
 }
