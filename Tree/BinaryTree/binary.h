@@ -42,6 +42,14 @@ public:
 		del(root);
 	}
 
+	void del(Node<T>* node) {
+		if (node != nullptr) {
+			del(node->left);
+			del(node->right);
+			delete node;
+		}
+	}
+
 	void DFS(void(*operation)(Node<T>*)) {
 		DFS_preorder(root, operation);
 	}
@@ -52,6 +60,30 @@ public:
 			DFS_preorder(current->left, operation);
 			DFS_preorder(current->right, operation);
 		}
+	}
+
+	void inorderDFS(Node<T>* node) {
+		if (node == nullptr) {
+			return;
+		}
+
+		inorderDFS(node->left);
+
+		std::cout << node->data << " ";
+
+		inorderDFS(node->right);
+	}
+
+	void postorderDFS(Node<T>* node) {
+		if (node == nullptr) {
+			return;
+		}
+
+		postorderDFS(node->left);
+
+		postorderDFS(node->right);
+
+		std::cout << node->data << " ";
 	}
 
 	void BFS(void(*operation)(Node<T>*)) {
@@ -69,101 +101,263 @@ public:
 		}
 	}
 
-	void insert(T value) {
-		this->flag = 0;
+	void insert(const T& value) {
+		Node<T>* newNode = new Node<T>(value);
 		if (root == nullptr) {
-			root = new Node<T>(value);
+			root = newNode;
+			return;
 		}
-		else {
-			insert_dfs(value, root);
-		}
-	}
 
-	void insert_dfs(T value,Node<T>* cur){
-		if (this->flag == 1) { 
-			return; 
-		}
-		else{
-			if (cur->left == nullptr && this->flag == 0) {
-				Node<T>* newNode = new Node<T>(value);
-				cur->left = newNode;
-				this->flag = 1;
-				return;
+		std::queue<Node<T>*> q;
+		q.push(root);
+
+		while (!q.empty()) {
+			Node<T>* current = q.front();
+			q.pop();
+
+			if (current->left != nullptr) {
+				q.push(current->left);
 			}
 			else {
-				if (cur->right == nullptr && this->flag == 0) {
-					Node<T>* newNode = new Node<T>(value);
-					cur->right = newNode;
-					this->flag = 1;
-					return;
+				current->left = newNode;
+				break;
+			}
+
+			if (current->right != nullptr) {
+				q.push(current->right);
+			}
+			else {
+				current->right = newNode;
+				break;
+			}
+		}
+	}
+
+	Node<T>* find(const T& value) {
+		
+		if (root == nullptr) {
+			std::cout << "the tree is empty" << std::endl;
+			return nullptr;
+		}
+
+		std::queue<Node<T>*> q;
+		q.push(root);
+
+		while (!q.empty()) {
+			Node<T>* current = q.front();
+			q.pop();
+
+			if (current->data == value) {
+				return current;
+			}
+
+			if (current->left != nullptr) {
+				q.push(current->left);
+			}
+			if (current->right != nullptr) {
+				q.push(current->right);
+			}
+			
+		}
+		return nullptr;
+	}
+
+	void remove(const T& value) {
+		Node<T>* deleted = find(value);
+		Node<T>* parentDeleted = findParent(deleted);
+		
+		if ((deleted->left == nullptr) && (deleted->right == nullptr)) {
+			if (parentDeleted->left == deleted) {
+				parentDeleted->left = nullptr;
+			}
+			if (parentDeleted->right == deleted) {
+				parentDeleted->right = nullptr;
+			}
+			delete deleted;
+			return;
+		}
+
+		Node<T>* deep = findDeepestElement();
+		Node<T>* parentDeep = findParent(deep);
+
+		if (parentDeep->left == deep) {
+			parentDeep->left = nullptr;
+		}
+		if (parentDeep->right == deep) {
+			parentDeep->right = nullptr;
+		}
+
+		if (deleted != root) {
+			if (parentDeleted->left == deleted) {
+				parentDeleted->left = deep;
+			}
+			if (parentDeleted->right == deleted) {
+				parentDeleted->right = deep;
+			}
+		}
+		
+		deep->left = deleted->left;
+		deep->right = deleted->right;
+		if (deleted == root) {
+			root = deep;
+		}
+		delete deleted;
+	}
+
+	Node<T>* findParent(Node<T>* node) {
+		if (root == nullptr) {
+			return nullptr;
+		}
+
+		std::queue<Node<T>*> q;
+		q.push(root);
+
+		while (!q.empty()) {
+			Node<T>* current = q.front();
+			q.pop();
+
+			if (current->left != nullptr) {
+				if (current->left == node) {
+					return current;
+					break;
 				}
-				else{
-					insert_dfs(value, cur->left);
-					insert_dfs(value, cur->right);
+				q.push(current->left);
+			}
+			if (current->right != nullptr) {
+				if (current->right == node) {
+					return current;
+					break;
 				}
+				q.push(current->right);
 			}
 		}
 
-	}
-	Node<T>* find(T value){
-
-		return find_dfs(value, root);
+		return nullptr;
 	}
 
-	Node<T>* find_dfs(T value, Node<T>* cur) {
-		if (cur->data == value) {
-			return cur;
+	Node<T>* findDeepestElement() {
+		if (!root) {
+			return nullptr;
 		}
-		if (cur->left != nullptr) {
-			find_dfs(value, cur->left);
+
+		Node<T>* deepestNode = nullptr;
+
+		std::queue<Node<T>*> q;
+		q.push(root);
+
+		while (!q.empty()) {
+			Node<T>* current = q.front();
+			q.pop();
+
+			deepestNode = current;
+
+			if (current->left != nullptr) {
+				q.push(current->left);
+			}
+			if (current->right != nullptr) {
+				q.push(current->right);
+			}
 		}
-		if (cur->right != nullptr) {
-			find_dfs(value, cur->right);
-		}
-		return cur;
+
+		return deepestNode;
 	}
-	void del(Node<T>* node){
+
+
+	void printTree() {
+		if (root == nullptr) {
+			std::cout << "empty tree\n";
+			return;
+		}
+
+		std::queue<Node<T>*> q;
+		q.push(root);
+
+		while (!q.empty()) {
+			int size = q.size();
+			while (size--) {
+				Node<T>* current = q.front();
+				q.pop();
+
+				std::cout << current->data << " ";
+
+				if (current->left != nullptr) {
+					q.push(current->left);
+				}
+				if (current->right != nullptr) {
+					q.push(current->right);
+				}
+			}
+			std::cout << std::endl;
+		}
+	}
+
+	void treeHeight() {
+		std::cout << "Height of tree:" << maxDepth(root) << "\n";
+	}
+
+	int maxDepth(Node<T>* node) {
 		if (node == nullptr) {
-			return;
+			return 0;
 		}
-		if (node->left != nullptr) {
-			del(node->left);
-		}
-		if (node->right != nullptr) {
-			del(node->right);
-		}
-		node->left = nullptr;
-		node->right = nullptr;
-		delete node;
-	}
-	
-	void replace(Node<T>* replaceable, T value) {
-		if (root == nullptr || replaceable == nullptr) {
-			insert(value);
-			return;
-		}
-		if (root == replaceable) {
-			root->data = value;
-		}
-		replace_dfs(replaceable, value, root);
+
+		int leftDepth = maxDepth(node->left);
+		int rightDepth = maxDepth(node->right);
+		int height = 1 + std::max(leftDepth, rightDepth);
+		return height;
 	}
 
-	void replace_dfs(Node<T>* replaceable, T value, Node<T>* cur) {
-		if (cur == nullptr) {
-			std::cout << "replacement is not possible" << std::endl;
-			return;
+	int getNodeCount() const {
+		if (!root) {
+			return 0;
 		}
-		if (cur->left == replaceable) {
-			cur->left->data = value;
-			return;
+
+		int count = 0;
+		std::queue<Node<T>*> q;
+		q.push(root);
+
+		while (!q.empty()) {
+			Node<T>* current = q.front();
+			q.pop();
+			count++;
+
+			if (current->left) {
+				q.push(current->left);
+			}
+			if (current->right) {
+				q.push(current->right);
+			}
 		}
-		if (cur->right == replaceable) {
-			cur->right->data = value;
-			return;
-		}
-		replace_dfs(replaceable, value, cur->left);
-		replace_dfs(replaceable, value, cur->right);
+
+		return count;
 	}
 
+	int getLevel(Node<T>* node) const {
+		if (root == nullptr) {
+			return -1;
+		}
+
+		std::queue<std::pair<Node<T>*, int>> q;
+		q.push({ root, 0 });
+
+		while (!q.empty()) {
+			Node<T>* current = q.front().first;
+			int level = q.front().second;
+			q.pop();
+
+			if (current == node) {
+				return level;
+			}
+
+			if (current->left != nullptr) {
+				q.push({ current->left, level + 1 });
+			}
+
+			if (current->right != nullptr) {
+				q.push({ current->right, level + 1 });
+			}
+		}
+
+		return -1;
+	}
 };
 #endif // !BINARY_H
