@@ -264,31 +264,24 @@ public:
 
 
 	void printTree() {
-		if (root == nullptr) {
-			std::cout << "empty tree\n";
+		if (!root) {
+			std::cout << "Tree is empty\n";
 			return;
 		}
 
-		std::queue<Node<T>*> q;
-		q.push(root);
+		printTreeHelper(root, 0);
+	}
 
-		while (!q.empty()) {
-			int size = q.size();
-			while (size--) {
-				Node<T>* current = q.front();
-				q.pop();
-
-				std::cout << current->data << " ";
-
-				if (current->left != nullptr) {
-					q.push(current->left);
-				}
-				if (current->right != nullptr) {
-					q.push(current->right);
-				}
-			}
-			std::cout << std::endl;
+	void printTreeHelper(Node<T>* node, int depth) {
+		if (node == nullptr) {
+			return;
 		}
+
+		printTreeHelper(node->right, depth + 1);
+
+		std::cout << std::string(depth * 4, ' ') << node->data << "\n";
+
+		printTreeHelper(node->left, depth + 1);
 	}
 
 	void treeHeight() {
@@ -358,6 +351,42 @@ public:
 		}
 
 		return -1;
+	}
+
+	void printLevelOfNode(const T& value) {
+		if (!root) {
+			std::cout << "Tree is empty\n";
+			return;
+		}
+
+		std::queue<Node<T>> q;
+		std::queue<int> levelQueue;
+		q.push(root);
+		levelQueue.push(0);
+
+		while (!q.empty()) {
+			Node<T> current = q.front();
+			int level = levelQueue.front();
+			q.pop();
+			levelQueue.pop();
+
+			if (current->data == value) {
+				std::cout << "Level of node " << value << " is: " << level << std::endl;
+				return;
+			}
+
+			if (current->left) {
+				q.push(current->left);
+				levelQueue.push(level + 1);
+			}
+
+			if (current->right) {
+				q.push(current->right);
+				levelQueue.push(level + 1);
+			}
+		}
+
+		std::cout << "Node " << value << " not found in the tree\n";
 	}
 };
 #endif // !BINARY_H
